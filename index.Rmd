@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Preparativo 
 
 ## Carga de paquetes 
-```{r librerias}  
+```{r librerias, message=FALSE}  
 # dplyr
 library(dplyr)
 
@@ -77,7 +77,49 @@ rios <- rios %>%
 
 slice_head(rios, n = 10)
 ```
+### select ()
 
+```{r}
+covid_columnas_seleccionadas <-
+  covid %>%
+  select(FECHA, muj_posi, hom_posi) %>%
+  rename(
+    fecha = FECHA,
+    positivos_mujeres = muj_posi,
+    positivos_hombres = hom_posi
+  ) %>%
+  mutate(fecha = as.Date(fecha, format = "%d/%m/%Y"))
 
+slice_head(covid_columnas_seleccionadas, n = 10)
+```
+
+### filter()
+
+```{r}
+# Selección, renombramiento, conversión de columnas y filtrado
+covid_filtrado <-
+  covid %>%
+  select(FECHA, nue_posi) %>%
+  rename(fecha = FECHA, positivos_nuevos = nue_posi) %>%
+  mutate(fecha = as.Date(fecha, format = "%d/%m/%Y")) %>%
+  filter(positivos_nuevos >= 2500)
+
+# Despliegue del data frame con los resultados
+covid_filtrado
+```
+###arrange 
+```{r}
+covid_filtrado_ordenado_x_positivos_nuevos <-
+  covid %>%
+  select(FECHA, nue_posi) %>%
+  rename(fecha = FECHA, positivos_nuevos = nue_posi) %>%
+  mutate(fecha = as.Date(fecha, format = "%d/%m/%Y")) %>%
+  filter(positivos_nuevos >= 2500) %>%
+  arrange(desc(positivos_nuevos))
+
+# Despliegue del data frame con los resultados
+#covid_filtrado_ordenado_x_positivos_nuevos
+slice_head(covid_filtrado_ordenado_x_positivos_nuevos, n = 10)
+```
 
 
