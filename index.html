@@ -187,8 +187,96 @@ library(ggplot2)</code></pre>
 </div>
 <div id="carga-de-datos" class="section level2">
 <h2>Carga de datos</h2>
-<pre class="r"><code>rios &lt;-
-  read.csv(file = &#39;https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/hidrologia/fdc/fdc.csv&#39;)</code></pre>
+<pre class="r"><code>#datos rios
+rios &lt;-
+  read.csv(file = &#39;https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/hidrologia/fdc/fdc.csv&#39;)
+
+#datos covid
+covid &lt;- 
+  read.csv(
+    file=&#39;https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/minsalud/covid/ultimafecha_CSV_GENERAL.csv&#39;, 
+    sep = &quot;,&quot;
+  )</code></pre>
+<p>##dplyr</p>
+<div id="mutate" class="section level3">
+<h3>mutate ()</h3>
+<pre class="r"><code>#estructura del data frame
+str(rios)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    3845 obs. of  3 variables:
+##  $ Tiempo             : chr  &quot;6/22/1973&quot; &quot;6/23/1973&quot; &quot;6/24/1973&quot; &quot;6/25/1973&quot; ...
+##  $ Pandora.mm..637km2.: num  7.46 6.17 6.32 7.8 7.72 7.83 5.02 3.84 3.21 2.77 ...
+##  $ Banano.mm..90km2.  : num  21 14.8 27.6 19.7 15.2 ...</code></pre>
+<pre class="r"><code># despliegue los primeros registros
+slice_head(rios,n=10)</code></pre>
+<pre><code>##       Tiempo Pandora.mm..637km2. Banano.mm..90km2.
+## 1  6/22/1973                7.46             21.02
+## 2  6/23/1973                6.17             14.78
+## 3  6/24/1973                6.32             27.65
+## 4  6/25/1973                7.80             19.68
+## 5  6/26/1973                7.72             15.17
+## 6  6/27/1973                7.83             23.14
+## 7  6/28/1973                5.02             14.30
+## 8  6/29/1973                3.84             13.54
+## 9  6/30/1973                3.21             11.42
+## 10  7/1/1973                2.77             10.18</code></pre>
+<pre class="r"><code># despliegue los últimos registros
+slice_tail(rios,n=10)</code></pre>
+<pre><code>##        Tiempo Pandora.mm..637km2. Banano.mm..90km2.
+## 1  12/22/1983                1.30             12.96
+## 2  12/23/1983                1.30             22.66
+## 3  12/24/1983                1.99             19.97
+## 4  12/25/1983                1.80             14.40
+## 5  12/26/1983                1.65             31.97
+## 6  12/27/1983                1.57             25.44
+## 7  12/28/1983                1.45             16.90
+## 8  12/29/1983                1.42             14.21
+## 9  12/30/1983                1.67             12.96
+## 10 12/31/1983                1.93             13.82</code></pre>
+<pre class="r"><code># despliegue registros al azar
+slice_sample(rios,n=10)</code></pre>
+<pre><code>##        Tiempo Pandora.mm..637km2. Banano.mm..90km2.
+## 1   10/8/1974                2.67              8.93
+## 2    2/7/1980                3.53             12.67
+## 3   6/28/1980                2.69             18.14
+## 4    6/3/1977                6.82             15.94
+## 5    5/1/1981                7.07             12.38
+## 6   3/19/1978                5.51              6.61
+## 7   12/9/1983                1.45             15.07
+## 8   8/11/1983                2.63              4.93
+## 9    1/5/1974                5.43             11.62
+## 10 12/21/1975                5.75             33.98</code></pre>
+<pre class="r"><code>#funciones enlazadas
+rios %&gt;%slice_head(n = 10) %&gt;% slice_tail(n = 2)</code></pre>
+<pre><code>##      Tiempo Pandora.mm..637km2. Banano.mm..90km2.
+## 1 6/30/1973                3.21             11.42
+## 2  7/1/1973                2.77             10.18</code></pre>
+<pre class="r"><code>#funciones anidadas
+slice_tail(slice_head(rios, n = 10), n = 2)</code></pre>
+<pre><code>##      Tiempo Pandora.mm..637km2. Banano.mm..90km2.
+## 1 6/30/1973                3.21             11.42
+## 2  7/1/1973                2.77             10.18</code></pre>
+<pre class="r"><code>#Cambio nombre de las columnas mediante rename
+rios &lt;- rios %&gt;% 
+  rename(fecha = Tiempo,
+         pandora = Pandora.mm..637km2.,
+         banano = Banano.mm..90km2.)
+rios &lt;- rios %&gt;% 
+  mutate (fecha = as.Date(fecha, format = &quot;%m/%d/%Y&quot;),
+          promedio = (pandora + banano)/2)
+
+slice_head(rios, n = 10)</code></pre>
+<pre><code>##         fecha pandora banano promedio
+## 1  1973-06-22    7.46  21.02   14.240
+## 2  1973-06-23    6.17  14.78   10.475
+## 3  1973-06-24    6.32  27.65   16.985
+## 4  1973-06-25    7.80  19.68   13.740
+## 5  1973-06-26    7.72  15.17   11.445
+## 6  1973-06-27    7.83  23.14   15.485
+## 7  1973-06-28    5.02  14.30    9.660
+## 8  1973-06-29    3.84  13.54    8.690
+## 9  1973-06-30    3.21  11.42    7.315
+## 10 1973-07-01    2.77  10.18    6.475</code></pre>
+</div>
 </div>
 </div>
 

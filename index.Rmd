@@ -79,16 +79,5 @@ slice_head(rios, n = 10)
 ```
 
 
-```{r}
-#Cambio nombre de las columnas mediante rename
-rios <- rios %>% 
-  rename(fecha = Tiempo,
-         pandora = Pandora.mm..637km2.,
-         banano = Banano.mm..90km2.)%>% 
-  mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"),
-          promedio = (pandora + banano)/2)
 
-slice_head(rios, n = 10)
-
-```
 
