@@ -227,17 +227,17 @@ slice_tail(rios,n=10)</code></pre>
 ## 10 12/31/1983                1.93             13.82</code></pre>
 <pre class="r"><code># despliegue registros al azar
 slice_sample(rios,n=10)</code></pre>
-<pre><code>##       Tiempo Pandora.mm..637km2. Banano.mm..90km2.
-## 1  10/1/1975                4.07              8.65
-## 2  7/10/1978                5.25              9.89
-## 3  6/25/1980                3.20             23.14
-## 4  11/2/1982                6.82              5.34
-## 5  11/6/1982                3.46             22.46
-## 6  8/23/1976                3.57             12.38
-## 7   8/5/1975               14.92             61.34
-## 8  7/21/1982                3.68              6.69
-## 9   8/2/1982                2.35              5.26
-## 10 2/10/1976                2.67             17.66</code></pre>
+<pre><code>##        Tiempo Pandora.mm..637km2. Banano.mm..90km2.
+## 1  11/10/1977                1.91              6.23
+## 2   4/12/1980                2.39             28.22
+## 3   1/19/1980                1.68             13.63
+## 4   7/29/1973                2.67             11.04
+## 5   3/19/1976                1.99              5.39
+## 6    4/9/1976                1.33              3.79
+## 7    7/6/1973                3.00             10.37
+## 8  11/16/1981                1.13              5.15
+## 9    9/7/1977                1.13              8.01
+## 10 11/16/1976                4.61              8.37</code></pre>
 <pre class="r"><code>#funciones enlazadas
 rios %&gt;%slice_head(n = 10) %&gt;% slice_tail(n = 2)</code></pre>
 <pre><code>##      Tiempo Pandora.mm..637km2. Banano.mm..90km2.
@@ -355,6 +355,93 @@ slice_head(covid_filtrado_ordenado_x_positivos_nuevos, n = 10)</code></pre>
 ## 8  2021-09-01             2848
 ## 9  2021-09-10             2825
 ## 10 2021-05-14             2815</code></pre>
+<p>###Summarise</p>
+<pre class="r"><code># Selección, renombramiento, filtrado y conversión de columnas
+covid_positivos_nuevos_sumarizado_x_mes &lt;-
+  covid %&gt;%
+  select(FECHA, nue_posi) %&gt;%
+  rename(fecha = FECHA, positivos_nuevos = nue_posi) %&gt;%
+  mutate(fecha = as.Date(fecha, format = &quot;%d/%m/%Y&quot;)) %&gt;%
+  group_by(anio = format(fecha,&quot;%Y&quot;), mes = format(fecha,&quot;%m&quot;)) %&gt;%
+  summarise(suma_positivos = sum(positivos_nuevos))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;anio&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code># Despliegue del data frame con los resultados
+covid_positivos_nuevos_sumarizado_x_mes</code></pre>
+<pre><code>## # A tibble: 19 x 3
+## # Groups:   anio [2]
+##    anio  mes   suma_positivos
+##    &lt;chr&gt; &lt;chr&gt;          &lt;int&gt;
+##  1 2020  03               347
+##  2 2020  04               372
+##  3 2020  05               337
+##  4 2020  06              2403
+##  5 2020  07             14361
+##  6 2020  08             23467
+##  7 2020  09             34473
+##  8 2020  10             34211
+##  9 2020  11             29667
+## 10 2020  12             29683
+## 11 2021  01             24959
+## 12 2021  02             10626
+## 13 2021  03             12440
+## 14 2021  04             33645
+## 15 2021  05             67995
+## 16 2021  06             48952
+## 17 2021  07             40262
+## 18 2021  08             55526
+## 19 2021  09             33010</code></pre>
+<pre class="r"><code># Selección, renombramiento, filtrado y conversión de columnas
+covid_positivos_nuevos_sumarizado_x_mes &lt;-
+  covid %&gt;%
+  select(FECHA, nue_posi) %&gt;%
+  rename(fecha = FECHA, positivos_nuevos = nue_posi) %&gt;%
+  mutate(fecha = as.Date(fecha, format = &quot;%d/%m/%Y&quot;)) %&gt;%
+  group_by(mes = format(fecha,&quot;%m&quot;)) %&gt;%
+  summarise(suma_positivos = sum(positivos_nuevos))
+
+# Despliegue del data frame con los resultados
+covid_positivos_nuevos_sumarizado_x_mes</code></pre>
+<pre><code>## # A tibble: 12 x 2
+##    mes   suma_positivos
+##    &lt;chr&gt;          &lt;int&gt;
+##  1 01             24959
+##  2 02             10626
+##  3 03             12787
+##  4 04             34017
+##  5 05             68332
+##  6 06             51355
+##  7 07             54623
+##  8 08             78993
+##  9 09             67483
+## 10 10             34211
+## 11 11             29667
+## 12 12             29683</code></pre>
+<pre class="r"><code># promedio de casos nuevos por mes
+covid_positivos_nuevos_promedio_x_mes &lt;-
+  covid %&gt;%
+  select(FECHA, nue_posi) %&gt;%
+  rename(fecha = FECHA, positivos_nuevos = nue_posi) %&gt;%
+  mutate(fecha = as.Date(fecha, format = &quot;%d/%m/%Y&quot;)) %&gt;%
+  group_by(mes = format(fecha,&quot;%m&quot;)) %&gt;%
+  summarise(promedio_positivos = mean(positivos_nuevos))
+
+# Despliegue del data frame con los resultados
+covid_positivos_nuevos_promedio_x_mes</code></pre>
+<pre><code>## # A tibble: 12 x 2
+##    mes   promedio_positivos
+##    &lt;chr&gt;              &lt;dbl&gt;
+##  1 01                  805.
+##  2 02                  380.
+##  3 03                  224.
+##  4 04                  567.
+##  5 05                 1102.
+##  6 06                  856.
+##  7 07                  881.
+##  8 08                 1274.
+##  9 09                 1534.
+## 10 10                 1104.
+## 11 11                  989.
+## 12 12                  958.</code></pre>
 </div>
 </div>
 </div>
