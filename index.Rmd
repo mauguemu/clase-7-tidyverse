@@ -1,5 +1,5 @@
 ---
-title: "Ejemplos de tidyverse"
+title: "Ejemplos de Tidyverse"
 output: html_document
 ---
 
@@ -7,22 +7,88 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# Preparativo 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Carga de paquetes 
+```{r librerias}  
+# dplyr
+library(dplyr)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+# ggplot2
+library(ggplot2)
 ```
 
-## Including Plots
+## Carga de datos
 
-You can also embed plots, for example:
+```{r datos}
+#datos rios
+rios <-
+  read.csv(file = 'https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/hidrologia/fdc/fdc.csv')
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+#datos covid
+covid <- 
+  read.csv(
+    file='https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/minsalud/covid/ultimafecha_CSV_GENERAL.csv', 
+    sep = ","
+  )
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+##dplyr
+
+### mutate ()
+
+```{r}
+#estructura del data frame
+str(rios)
+```
+
+
+```{r}
+# despliegue los primeros registros
+slice_head(rios,n=10)
+
+# despliegue los últimos registros
+slice_tail(rios,n=10)
+
+# despliegue registros al azar
+slice_sample(rios,n=10)
+
+```
+
+```{r}
+#funciones enlazadas
+rios %>%slice_head(n = 10) %>% slice_tail(n = 2)
+```
+
+```{r}
+#funciones anidadas
+slice_tail(slice_head(rios, n = 10), n = 2)
+```
+
+```{r}
+#Cambio nombre de las columnas mediante rename
+rios <- rios %>% 
+  rename(fecha = Tiempo,
+         pandora = Pandora.mm..637km2.,
+         banano = Banano.mm..90km2.)
+rios <- rios %>% 
+  mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"),
+          promedio = (pandora + banano)/2)
+
+slice_head(rios, n = 10)
+```
+
+
+```{r}
+#Cambio nombre de las columnas mediante rename
+rios <- rios %>% 
+  rename(fecha = Tiempo,
+         pandora = Pandora.mm..637km2.,
+         banano = Banano.mm..90km2.)%>% 
+  mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"),
+          promedio = (pandora + banano)/2)
+
+slice_head(rios, n = 10)
+
+```
+
